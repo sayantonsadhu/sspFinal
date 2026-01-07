@@ -1,30 +1,52 @@
 import React, { useState, useEffect } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
-import { heroCarouselImages } from '../mock';
+import axios from 'axios';
+
+const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
+const API = `${BACKEND_URL}/api`;
 
 const HeroCarousel = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isTransitioning, setIsTransitioning] = useState(false);
+  const [images, setImages] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    fetchImages();
+  }, []);
+
+  useEffect(() => {
+    if (images.length === 0) return;
+    
     const interval = setInterval(() => {
       handleNext();
     }, 5000);
 
     return () => clearInterval(interval);
-  }, [currentIndex]);
+  }, [currentIndex, images]);
+
+  const fetchImages = async () => {
+    try {
+      const response = await axios.get(`${API}/hero-carousel`);
+      setImages(response.data);
+    } catch (error) {
+      console.error('Failed to load carousel images:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleNext = () => {
-    if (isTransitioning) return;
+    if (isTransitioning || images.length === 0) return;
     setIsTransitioning(true);
-    setCurrentIndex((prev) => (prev + 1) % heroCarouselImages.length);
+    setCurrentIndex((prev) => (prev + 1) % images.length);
     setTimeout(() => setIsTransitioning(false), 800);
   };
 
   const handlePrev = () => {
-    if (isTransitioning) return;
+    if (isTransitioning || images.length === 0) return;
     setIsTransitioning(true);
-    setCurrentIndex((prev) => (prev - 1 + heroCarouselImages.length) % heroCarouselImages.length);
+    setCurrentIndex((prev) => (prev - 1 + images.length) % images.length);
     setTimeout(() => setIsTransitioning(false), 800);
   };
 
@@ -35,11 +57,15 @@ const HeroCarousel = () => {
     setTimeout(() => setIsTransitioning(false), 800);
   };
 
+  if (loading || images.length === 0) {
+    return <div className="w-full h-screen bg-black" />;
+  }
+
   return (
     <div className="relative w-full h-screen overflow-hidden bg-black">
       {/* Images */}
       <div className="relative w-full h-full">
-        {heroCarouselImages.map((image, index) => (
+        {images.map((image, index) => (
           <div
             key={image.id}
             className={`absolute inset-0 transition-opacity duration-[800ms] ease-in-out ${
@@ -47,7 +73,7 @@ const HeroCarousel = () => {
             }`}
           >
             <img
-              src={image.url}
+              src={`${BACKEND_URL}${image.url}`}
               alt={image.alt}
               className="w-full h-full object-cover"
               loading={index === 0 ? 'eager' : 'lazy'}
@@ -75,7 +101,7 @@ const HeroCarousel = () => {
 
       {/* Dots Navigation */}
       <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-20 flex gap-3">
-        {heroCarouselImages.map((_, index) => (
+        {images.map((_, index) => (
           <button
             key={index}
             onClick={() => goToSlide(index)}
