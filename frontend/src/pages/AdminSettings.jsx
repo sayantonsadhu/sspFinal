@@ -182,23 +182,9 @@ const AdminSettings = () => {
 
         {/* Settings Form */}
         <form onSubmit={handleSaveSettings} className="bg-white p-6 shadow-lg">
-          <h2 className="text-xl font-medium mb-4">General Settings</h2>
+          <h2 className="text-xl font-medium mb-4">Contact Information</h2>
           
           <div className="space-y-4">
-            <div>
-              <label htmlFor="siteName" className="block text-sm font-medium text-gray-700 mb-2">
-                Site Name
-              </label>
-              <input
-                type="text"
-                id="siteName"
-                value={settings.siteName}
-                onChange={(e) => setSettings({ ...settings, siteName: e.target.value })}
-                required
-                className="w-full px-4 py-3 border border-gray-300 focus:border-red-500 focus:ring-1 focus:ring-red-500 outline-none transition-colors"
-              />
-            </div>
-
             <div>
               <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-2">
                 Phone Number
@@ -251,7 +237,7 @@ const AdminSettings = () => {
               ) : (
                 <Save className="w-5 h-5" />
               )}
-              <span>{saving ? 'Saving...' : 'Save Settings'}</span>
+              <span>{saving ? 'Saving...' : 'Save All Settings'}</span>
             </button>
           </div>
         </form>
