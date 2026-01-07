@@ -42,6 +42,7 @@ class Wedding(BaseModel):
     groomName: str
     date: str
     location: str
+    images: List[str] = []
     createdAt: datetime = Field(default_factory=datetime.utcnow)
 
 class WeddingCreate(BaseModel):
