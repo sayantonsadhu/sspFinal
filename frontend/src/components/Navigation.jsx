@@ -1,10 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { Menu, X, Instagram, Facebook, Mail, Phone } from 'lucide-react';
-import { siteSettings } from '../mock';
+import { Menu, X } from 'lucide-react';
+import axios from 'axios';
+
+const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
+const API = `${BACKEND_URL}/api`;
 
 const Navigation = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [settings, setSettings] = useState(null);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -14,6 +18,19 @@ const Navigation = () => {
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  useEffect(() => {
+    fetchSettings();
+  }, []);
+
+  const fetchSettings = async () => {
+    try {
+      const response = await axios.get(`${API}/settings`);
+      setSettings(response.data);
+    } catch (error) {
+      console.error('Failed to load settings:', error);
+    }
+  };
 
   const navLinks = [
     { name: 'Home', href: '#home' },
@@ -41,10 +58,10 @@ const Navigation = () => {
               isScrolled ? 'text-gray-900' : 'text-white'
             }`}
           >
-            {siteSettings.logoUrl ? (
+            {settings?.logoUrl ? (
               <img 
-                src={siteSettings.logoUrl} 
-                alt={siteSettings.siteName}
+                src={`${BACKEND_URL}${settings.logoUrl}`}
+                alt={settings.siteName || 'Sayanton Sadhu Photography'}
                 className="h-10 w-auto object-contain"
               />
             ) : (
