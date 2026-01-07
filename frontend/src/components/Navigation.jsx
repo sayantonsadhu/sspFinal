@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Menu, X, Instagram, Facebook, Mail, Phone } from 'lucide-react';
+import { siteSettings } from '../mock';
 
 const Navigation = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -36,11 +37,21 @@ const Navigation = () => {
           {/* Logo */}
           <a
             href="#home"
-            className={`text-2xl font-light tracking-wider transition-colors ${
+            className={`flex items-center gap-3 transition-colors ${
               isScrolled ? 'text-gray-900' : 'text-white'
             }`}
           >
-            <span className="font-serif italic">Rig</span> Photography
+            {siteSettings.logoUrl ? (
+              <img 
+                src={siteSettings.logoUrl} 
+                alt={siteSettings.siteName}
+                className="h-10 w-auto object-contain"
+              />
+            ) : (
+              <span className="text-2xl font-light tracking-wider">
+                <span className="font-serif italic">Sayanton</span> Sadhu Photography
+              </span>
+            )}
           </a>
 
           {/* Desktop Navigation */}
