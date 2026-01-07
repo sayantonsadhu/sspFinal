@@ -104,8 +104,17 @@ export const featuredFilm = {
 
 export const aboutData = {
   image: 'https://images.pexels.com/photos/3775262/pexels-photo-3775262.jpeg?w=800&q=80',
-  name: 'Rig Photography',
+  name: 'Sayanton Sadhu Photography',
   bio: `Capturing genuine emotions and once-in-a-lifetime moments with utmost care and professionalism. From pre-wedding shoots to post-wedding celebrations, we create timeless memories that tell your unique love story. Our editorial style combines candid moments with artistic composition, ensuring every frame reflects the beauty and emotion of your special day.`
+};
+
+export const siteSettings = {
+  id: 1,
+  siteName: 'Sayanton Sadhu Photography',
+  logoUrl: null,
+  phone: '+91 98765 43210',
+  email: 'hello@sayantonsadhu.com',
+  address: 'Kolkata, West Bengal, India'
 };
 
 export const photographyPackages = [
