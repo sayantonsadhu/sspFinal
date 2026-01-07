@@ -1,14 +1,32 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Play } from 'lucide-react';
-import { featuredFilm } from '../mock';
+import axios from 'axios';
+
+const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
+const API = `${BACKEND_URL}/api`;
 
 const FilmsSection = () => {
   const [isPlaying, setIsPlaying] = useState(false);
+  const [film, setFilm] = useState(null);
+
+  useEffect(() => {
+    fetchFilm();
+  }, []);
+
+  const fetchFilm = async () => {
+    try {
+      const response = await axios.get(`${API}/films/featured`);
+      setFilm(response.data);
+    } catch (error) {
+      console.error('Failed to load film:', error);
+    }
+  };
+
+  if (!film) return null;
 
   return (
     <section className="py-24 px-6 bg-gray-50">
       <div className="max-w-7xl mx-auto">
-        {/* Section Header */}
         <div className="text-center mb-16">
           <h2 className="text-5xl md:text-6xl font-light tracking-wide mb-4">
             Wedding Films
@@ -19,13 +37,12 @@ const FilmsSection = () => {
           <div className="w-20 h-0.5 bg-gradient-to-r from-transparent via-red-500 to-transparent mx-auto mt-6" />
         </div>
 
-        {/* Video Container */}
         <div className="max-w-5xl mx-auto">
           <div className="relative aspect-video bg-black rounded-lg overflow-hidden shadow-2xl">
             {!isPlaying ? (
               <>
                 <img
-                  src={featuredFilm.thumbnail}
+                  src={film.thumbnail}
                   alt="Featured Wedding Film"
                   className="w-full h-full object-cover"
                 />
@@ -44,7 +61,7 @@ const FilmsSection = () => {
               </>
             ) : (
               <iframe
-                src={`${featuredFilm.videoUrl}?autoplay=1`}
+                src={`${film.videoUrl}?autoplay=1`}
                 title="Featured Wedding Film"
                 className="w-full h-full"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
@@ -54,7 +71,6 @@ const FilmsSection = () => {
           </div>
         </div>
 
-        {/* Description */}
         <div className="text-center mt-12 max-w-3xl mx-auto">
           <p className="text-gray-700 leading-relaxed">
             Every wedding film is a unique masterpiece. We capture the emotions, the laughter, 

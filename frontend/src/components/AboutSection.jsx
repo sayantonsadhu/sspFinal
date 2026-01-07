@@ -1,27 +1,44 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Award, Heart, Camera } from 'lucide-react';
-import { aboutData } from '../mock';
+import axios from 'axios';
+
+const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
+const API = `${BACKEND_URL}/api`;
 
 const AboutSection = () => {
+  const [about, setAbout] = useState(null);
+
+  useEffect(() => {
+    fetchAbout();
+  }, []);
+
+  const fetchAbout = async () => {
+    try {
+      const response = await axios.get(`${API}/about`);
+      setAbout(response.data);
+    } catch (error) {
+      console.error('Failed to load about:', error);
+    }
+  };
+
+  if (!about) return null;
+
   return (
     <section className="py-24 px-6 bg-white">
       <div className="max-w-7xl mx-auto">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-          {/* Image Side */}
           <div className="relative">
             <div className="relative aspect-[4/5] overflow-hidden bg-gray-100">
               <img
-                src={aboutData.image}
-                alt={aboutData.name}
+                src={about.image.startsWith('http') ? about.image : `${BACKEND_URL}${about.image}`}
+                alt={about.name}
                 className="w-full h-full object-cover"
                 loading="lazy"
               />
             </div>
-            {/* Decorative Element */}
             <div className="absolute -bottom-6 -right-6 w-48 h-48 border-4 border-red-500 -z-10" />
           </div>
 
-          {/* Content Side */}
           <div>
             <h2 className="text-5xl md:text-6xl font-light tracking-wide mb-6">
               About Me
@@ -29,10 +46,9 @@ const AboutSection = () => {
             <div className="w-20 h-0.5 bg-red-500 mb-8" />
             
             <p className="text-lg text-gray-700 leading-relaxed mb-8">
-              {aboutData.bio}
+              {about.bio}
             </p>
 
-            {/* Features */}
             <div className="space-y-6 mt-12">
               <div className="flex items-start gap-4">
                 <div className="bg-red-50 p-3 rounded-lg">

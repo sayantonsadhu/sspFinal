@@ -1,6 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { X } from 'lucide-react';
-import { photographyPackages } from '../mock';
+import axios from 'axios';
+
+const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
+const API = `${BACKEND_URL}/api`;
 
 const PackageModal = ({ package: pkg, isOpen, onClose }) => {
   if (!isOpen) return null;
@@ -30,20 +33,22 @@ const PackageModal = ({ package: pkg, isOpen, onClose }) => {
             <p className="text-2xl text-red-500 font-light">{pkg.pricing}</p>
           </div>
 
-          <div>
-            <h3 className="text-xl font-medium mb-4">Gallery</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {pkg.images.map((image, index) => (
-                <div key={index} className="aspect-[4/3] overflow-hidden bg-gray-100">
-                  <img
-                    src={image}
-                    alt={`${pkg.title} - ${index + 1}`}
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-              ))}
+          {pkg.images && pkg.images.length > 0 && (
+            <div>
+              <h3 className="text-xl font-medium mb-4">Gallery</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {pkg.images.map((image, index) => (
+                  <div key={index} className="aspect-[4/3] overflow-hidden bg-gray-100">
+                    <img
+                      src={`${BACKEND_URL}${image}`}
+                      alt={`${pkg.title} - ${index + 1}`}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                ))}
+              </div>
             </div>
-          </div>
+          )}
         </div>
       </div>
     </div>
@@ -52,6 +57,20 @@ const PackageModal = ({ package: pkg, isOpen, onClose }) => {
 
 const PackagesSection = () => {
   const [selectedPackage, setSelectedPackage] = useState(null);
+  const [packages, setPackages] = useState([]);
+
+  useEffect(() => {
+    fetchPackages();
+  }, []);
+
+  const fetchPackages = async () => {
+    try {
+      const response = await axios.get(`${API}/packages`);
+      setPackages(response.data);
+    } catch (error) {
+      console.error('Failed to load packages:', error);
+    }
+  };
 
   return (
     <>
@@ -68,7 +87,7 @@ const PackagesSection = () => {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {photographyPackages.map((pkg) => (
+            {packages.map((pkg) => (
               <div
                 key={pkg.id}
                 className="group cursor-pointer bg-white overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500"
@@ -76,7 +95,7 @@ const PackagesSection = () => {
               >
                 <div className="relative aspect-[4/3] overflow-hidden">
                   <img
-                    src={pkg.thumbnail}
+                    src={`${BACKEND_URL}${pkg.thumbnail}`}
                     alt={pkg.title}
                     className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                     loading="lazy"
