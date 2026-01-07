@@ -27,8 +27,8 @@ const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
           {/* About */}
           <div>
-            <h3 className="text-2xl font-light mb-4">
-              <span className="font-serif italic">Sayanton</span> Sadhu Photography
+            <h3 className="text-2xl font-light mb-4" style={{ fontFamily: 'Montserrat, sans-serif' }}>
+              {settings?.siteName || 'Sayanton Sadhu Photography'}
             </h3>
             <p className="text-gray-400 leading-relaxed mb-6">
               Award-winning wedding photography capturing genuine emotions and once-in-a-lifetime moments with artistic excellence.
