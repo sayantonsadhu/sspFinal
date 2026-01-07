@@ -1,8 +1,41 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
-import { recentWeddings } from '../mock';
+import axios from 'axios';
+
+const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
+const API = `${BACKEND_URL}/api`;
 
 const RecentWeddings = () => {
+  const navigate = useNavigate();
+  const [weddings, setWeddings] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchWeddings();
+  }, []);
+
+  const fetchWeddings = async () => {
+    try {
+      const response = await axios.get(`${API}/weddings?limit=6`);
+      setWeddings(response.data);
+    } catch (error) {
+      console.error('Failed to load weddings:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <section className="py-24 px-6 bg-white">
+        <div className="max-w-7xl mx-auto text-center">
+          <p>Loading weddings...</p>
+        </div>
+      </section>
+    );
+  }
+
   return (
     <section className="py-24 px-6 bg-white">
       <div className="max-w-7xl mx-auto">
@@ -16,14 +49,15 @@ const RecentWeddings = () => {
 
         {/* Wedding Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {recentWeddings.map((wedding) => (
+          {weddings.map((wedding) => (
             <div
               key={wedding.id}
               className="group cursor-pointer"
+              onClick={() => navigate(`/wedding/${wedding.id}`)}
             >
               <div className="relative aspect-square overflow-hidden bg-gray-100 mb-4">
                 <img
-                  src={wedding.coverImage}
+                  src={`${BACKEND_URL}${wedding.coverImage}`}
                   alt={`${wedding.brideName} & ${wedding.groomName}`}
                   className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                   loading="lazy"
