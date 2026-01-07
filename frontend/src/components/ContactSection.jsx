@@ -1,12 +1,48 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Mail, Phone, MapPin, Send } from 'lucide-react';
-import { siteSettings } from '../mock';
+import axios from 'axios';
+import { toast } from 'sonner';
+
+const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
+const API = `${BACKEND_URL}/api`;
 
 const ContactSection = () => {
-  const handleSubmit = (e) => {
+  const [settings, setSettings] = useState(null);
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    weddingDate: '',
+    message: ''
+  });
+  const [submitting, setSubmitting] = useState(false);
+
+  useEffect(() => {
+    fetchSettings();
+  }, []);
+
+  const fetchSettings = async () => {
+    try {
+      const response = await axios.get(`${API}/settings`);
+      setSettings(response.data);
+    } catch (error) {
+      console.error('Failed to load settings:', error);
+    }
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // This will be connected to backend later
-    alert('Thank you for your inquiry! We will get back to you soon.');
+    setSubmitting(true);
+
+    try {
+      await axios.post(`${API}/contact`, formData);
+      toast.success('Thank you for your inquiry! We will get back to you soon.');
+      setFormData({ name: '', email: '', phone: '', weddingDate: '', message: '' });
+    } catch (error) {
+      toast.error('Failed to send inquiry. Please try again.');
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -33,6 +69,8 @@ const ContactSection = () => {
                 <input
                   type="text"
                   id="name"
+                  value={formData.name}
+                  onChange={(e) => setFormData({...formData, name: e.target.value})}
                   required
                   className="w-full px-4 py-3 border border-gray-300 focus:border-red-500 focus:ring-1 focus:ring-red-500 outline-none transition-colors"
                   placeholder="John Doe"
@@ -46,6 +84,8 @@ const ContactSection = () => {
                 <input
                   type="email"
                   id="email"
+                  value={formData.email}
+                  onChange={(e) => setFormData({...formData, email: e.target.value})}
                   required
                   className="w-full px-4 py-3 border border-gray-300 focus:border-red-500 focus:ring-1 focus:ring-red-500 outline-none transition-colors"
                   placeholder="john@example.com"
@@ -59,6 +99,8 @@ const ContactSection = () => {
                 <input
                   type="tel"
                   id="phone"
+                  value={formData.phone}
+                  onChange={(e) => setFormData({...formData, phone: e.target.value})}
                   required
                   className="w-full px-4 py-3 border border-gray-300 focus:border-red-500 focus:ring-1 focus:ring-red-500 outline-none transition-colors"
                   placeholder="+91 98765 43210"
@@ -66,12 +108,14 @@ const ContactSection = () => {
               </div>
 
               <div>
-                <label htmlFor="date" className="block text-sm font-medium text-gray-700 mb-2">
+                <label htmlFor="weddingDate" className="block text-sm font-medium text-gray-700 mb-2">
                   Wedding Date
                 </label>
                 <input
                   type="date"
-                  id="date"
+                  id="weddingDate"
+                  value={formData.weddingDate}
+                  onChange={(e) => setFormData({...formData, weddingDate: e.target.value})}
                   required
                   className="w-full px-4 py-3 border border-gray-300 focus:border-red-500 focus:ring-1 focus:ring-red-500 outline-none transition-colors"
                 />
@@ -83,6 +127,8 @@ const ContactSection = () => {
                 </label>
                 <textarea
                   id="message"
+                  value={formData.message}
+                  onChange={(e) => setFormData({...formData, message: e.target.value})}
                   required
                   rows="4"
                   className="w-full px-4 py-3 border border-gray-300 focus:border-red-500 focus:ring-1 focus:ring-red-500 outline-none transition-colors resize-none"
@@ -92,50 +138,59 @@ const ContactSection = () => {
 
               <button
                 type="submit"
-                className="w-full bg-red-500 text-white py-4 hover:bg-red-600 transition-colors flex items-center justify-center gap-2 uppercase tracking-wider text-sm font-medium"
+                disabled={submitting}
+                className="w-full bg-red-500 text-white py-4 hover:bg-red-600 transition-colors flex items-center justify-center gap-2 uppercase tracking-wider text-sm font-medium disabled:bg-gray-400"
               >
-                <span>Send Inquiry</span>
-                <Send className="w-4 h-4" />
+                {submitting ? 'Sending...' : (
+                  <>
+                    <span>Send Inquiry</span>
+                    <Send className="w-4 h-4" />
+                  </>
+                )}
               </button>
             </form>
           </div>
 
           {/* Contact Info */}
           <div className="space-y-8">
-            <div className="bg-gray-50 p-8">
-              <div className="flex items-start gap-4 mb-6">
-                <div className="bg-red-500 p-3 rounded-lg">
-                  <Phone className="w-6 h-6 text-white" />
-                </div>
-                <div>
-                  <h3 className="font-medium text-lg mb-2">Call Us</h3>
-                  <p className="text-gray-600">{siteSettings.phone}</p>
-                  <p className="text-sm text-gray-500 mt-1">Available 10 AM - 8 PM</p>
-                </div>
-              </div>
+            {settings && (
+              <>
+                <div className="bg-gray-50 p-8">
+                  <div className="flex items-start gap-4 mb-6">
+                    <div className="bg-red-500 p-3 rounded-lg">
+                      <Phone className="w-6 h-6 text-white" />
+                    </div>
+                    <div>
+                      <h3 className="font-medium text-lg mb-2">Call Us</h3>
+                      <p className="text-gray-600">{settings.phone}</p>
+                      <p className="text-sm text-gray-500 mt-1">Available 10 AM - 8 PM</p>
+                    </div>
+                  </div>
 
-              <div className="flex items-start gap-4 mb-6">
-                <div className="bg-red-500 p-3 rounded-lg">
-                  <Mail className="w-6 h-6 text-white" />
-                </div>
-                <div>
-                  <h3 className="font-medium text-lg mb-2">Email Us</h3>
-                  <p className="text-gray-600">{siteSettings.email}</p>
-                  <p className="text-sm text-gray-500 mt-1">We'll reply within 24 hours</p>
-                </div>
-              </div>
+                  <div className="flex items-start gap-4 mb-6">
+                    <div className="bg-red-500 p-3 rounded-lg">
+                      <Mail className="w-6 h-6 text-white" />
+                    </div>
+                    <div>
+                      <h3 className="font-medium text-lg mb-2">Email Us</h3>
+                      <p className="text-gray-600">{settings.email}</p>
+                      <p className="text-sm text-gray-500 mt-1">We'll reply within 24 hours</p>
+                    </div>
+                  </div>
 
-              <div className="flex items-start gap-4">
-                <div className="bg-red-500 p-3 rounded-lg">
-                  <MapPin className="w-6 h-6 text-white" />
+                  <div className="flex items-start gap-4">
+                    <div className="bg-red-500 p-3 rounded-lg">
+                      <MapPin className="w-6 h-6 text-white" />
+                    </div>
+                    <div>
+                      <h3 className="font-medium text-lg mb-2">Visit Studio</h3>
+                      <p className="text-gray-600">{settings.address}</p>
+                      <p className="text-sm text-gray-500 mt-1">By appointment only</p>
+                    </div>
+                  </div>
                 </div>
-                <div>
-                  <h3 className="font-medium text-lg mb-2">Visit Studio</h3>
-                  <p className="text-gray-600">{siteSettings.address}</p>
-                  <p className="text-sm text-gray-500 mt-1">By appointment only</p>
-                </div>
-              </div>
-            </div>
+              </>
+            )}
 
             <div className="bg-red-50 p-8">
               <h3 className="text-2xl font-light mb-4">Why Choose Us?</h3>
