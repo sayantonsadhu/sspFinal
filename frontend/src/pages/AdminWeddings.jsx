@@ -148,15 +148,18 @@ const AdminWeddings = () => {
                 className="w-full h-full object-cover"
               />
             </div>
-            <div className="p-4">
+              <div className="p-4">
               <h3 className="text-lg font-medium mb-1">
                 {wedding.brideName} & {wedding.groomName}
               </h3>
-              <p className="text-sm text-gray-500 mb-3">{wedding.location}</p>
+              <p className="text-sm text-gray-500 mb-1">{wedding.location}</p>
+              <p className="text-xs text-gray-400 mb-3">
+                {wedding.images?.length || 0} gallery images
+              </p>
               <div className="flex gap-2">
                 <button
                   onClick={() => navigate(`/admin/weddings/${wedding.id}/gallery`)}
-                  className="flex-1 bg-blue-500 text-white py-2 hover:bg-blue-600 transition-colors flex items-center justify-center gap-2"
+                  className="flex-1 bg-blue-500 text-white py-2 hover:bg-blue-600 transition-colors flex items-center justify-center gap-2 text-sm"
                 >
                   <Image className="w-4 h-4" />
                   <span>Gallery</span>
