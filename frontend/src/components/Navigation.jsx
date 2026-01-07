@@ -59,14 +59,19 @@ const Navigation = () => {
             }`}
           >
             {settings?.logoUrl ? (
-              <img 
-                src={`${BACKEND_URL}${settings.logoUrl}`}
-                alt={settings.siteName || 'Sayanton Sadhu Photography'}
-                className="h-10 w-auto object-contain"
-              />
+              <div className="flex items-center gap-3">
+                <img 
+                  src={`${BACKEND_URL}${settings.logoUrl}`}
+                  alt={settings.siteName || 'Sayanton Sadhu Photography'}
+                  className="h-10 w-auto object-contain"
+                />
+                <span className="text-xl font-light tracking-wider" style={{ fontFamily: 'Montserrat, sans-serif' }}>
+                  {settings.siteName || 'Sayanton Sadhu Photography'}
+                </span>
+              </div>
             ) : (
-              <span className="text-2xl font-light tracking-wider" style={{ fontFamily: 'Montserrat, sans-serif' }}>
-                <span className="font-serif italic">Sayanton</span> Sadhu Photography
+              <span className="text-xl md:text-2xl font-light tracking-wider" style={{ fontFamily: 'Montserrat, sans-serif' }}>
+                {settings?.siteName || 'Sayanton Sadhu Photography'}
               </span>
             )}
           </a>
