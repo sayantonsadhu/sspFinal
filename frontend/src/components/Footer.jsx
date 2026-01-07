@@ -1,5 +1,6 @@
 import React from 'react';
 import { Instagram, Facebook, Mail, Phone, MapPin, Heart } from 'lucide-react';
+import { siteSettings } from '../mock';
 
 const Footer = () => {
   return (
@@ -9,7 +10,7 @@ const Footer = () => {
           {/* About */}
           <div>
             <h3 className="text-2xl font-light mb-4">
-              <span className="font-serif italic">Rig</span> Photography
+              <span className="font-serif italic">Sayanton</span> Sadhu Photography
             </h3>
             <p className="text-gray-400 leading-relaxed mb-6">
               Award-winning wedding photography capturing genuine emotions and once-in-a-lifetime moments with artistic excellence.
@@ -30,7 +31,7 @@ const Footer = () => {
                 <Facebook className="w-5 h-5" />
               </a>
               <a
-                href="#"
+                href={`mailto:${siteSettings.email}`}
                 className="bg-white/10 hover:bg-red-500 p-3 rounded-full transition-all duration-300"
                 aria-label="Email"
               >
@@ -73,19 +74,19 @@ const Footer = () => {
               <li className="flex items-start gap-3">
                 <MapPin className="w-5 h-5 text-red-500 mt-1 flex-shrink-0" />
                 <span className="text-gray-400">
-                  Kolkata, West Bengal, India
+                  {siteSettings.address}
                 </span>
               </li>
               <li className="flex items-center gap-3">
                 <Phone className="w-5 h-5 text-red-500 flex-shrink-0" />
-                <a href="tel:+919876543210" className="text-gray-400 hover:text-red-500 transition-colors">
-                  +91 98765 43210
+                <a href={`tel:${siteSettings.phone}`} className="text-gray-400 hover:text-red-500 transition-colors">
+                  {siteSettings.phone}
                 </a>
               </li>
               <li className="flex items-center gap-3">
                 <Mail className="w-5 h-5 text-red-500 flex-shrink-0" />
-                <a href="mailto:hello@rigphotography.com" className="text-gray-400 hover:text-red-500 transition-colors">
-                  hello@rigphotography.com
+                <a href={`mailto:${siteSettings.email}`} className="text-gray-400 hover:text-red-500 transition-colors">
+                  {siteSettings.email}
                 </a>
               </li>
             </ul>
@@ -95,7 +96,7 @@ const Footer = () => {
         {/* Bottom Bar */}
         <div className="border-t border-gray-800 mt-12 pt-8 text-center">
           <p className="text-gray-400 text-sm flex items-center justify-center gap-2">
-            Made with <Heart className="w-4 h-4 text-red-500 fill-red-500" /> by Rig Photography © 2024
+            Made with <Heart className="w-4 h-4 text-red-500 fill-red-500" /> by Sayanton Sadhu Photography © 2024
           </p>
         </div>
       </div>
