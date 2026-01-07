@@ -1,5 +1,6 @@
 import React from 'react';
 import { Mail, Phone, MapPin, Send } from 'lucide-react';
+import { siteSettings } from '../mock';
 
 const ContactSection = () => {
   const handleSubmit = (e) => {
@@ -108,7 +109,7 @@ const ContactSection = () => {
                 </div>
                 <div>
                   <h3 className="font-medium text-lg mb-2">Call Us</h3>
-                  <p className="text-gray-600">+91 98765 43210</p>
+                  <p className="text-gray-600">{siteSettings.phone}</p>
                   <p className="text-sm text-gray-500 mt-1">Available 10 AM - 8 PM</p>
                 </div>
               </div>
@@ -119,7 +120,7 @@ const ContactSection = () => {
                 </div>
                 <div>
                   <h3 className="font-medium text-lg mb-2">Email Us</h3>
-                  <p className="text-gray-600">hello@rigphotography.com</p>
+                  <p className="text-gray-600">{siteSettings.email}</p>
                   <p className="text-sm text-gray-500 mt-1">We'll reply within 24 hours</p>
                 </div>
               </div>
@@ -130,7 +131,7 @@ const ContactSection = () => {
                 </div>
                 <div>
                   <h3 className="font-medium text-lg mb-2">Visit Studio</h3>
-                  <p className="text-gray-600">Kolkata, West Bengal</p>
+                  <p className="text-gray-600">{siteSettings.address}</p>
                   <p className="text-sm text-gray-500 mt-1">By appointment only</p>
                 </div>
               </div>
