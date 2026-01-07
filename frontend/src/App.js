@@ -13,12 +13,20 @@ import AboutSection from "./components/AboutSection";
 import PackagesSection from "./components/PackagesSection";
 import ContactSection from "./components/ContactSection";
 import Footer from "./components/Footer";
+import WeddingGallery from "./pages/WeddingGallery";
 
 // Admin Pages
 import AdminLogin from "./pages/AdminLogin";
 import AdminLayout from "./pages/AdminLayout";
 import AdminDashboard from "./pages/AdminDashboard";
 import AdminSettings from "./pages/AdminSettings";
+import AdminHeroCarousel from "./pages/AdminHeroCarousel";
+import AdminWeddings from "./pages/AdminWeddings";
+import AdminWeddingGallery from "./pages/AdminWeddingGallery";
+import AdminFilms from "./pages/AdminFilms";
+import AdminAbout from "./pages/AdminAbout";
+import AdminPackages from "./pages/AdminPackages";
+import AdminInquiries from "./pages/AdminInquiries";
 import ProtectedRoute from "./components/ProtectedRoute";
 
 const HomePage = () => {
@@ -56,6 +64,7 @@ function App() {
           <Routes>
             {/* Public Routes */}
             <Route path="/" element={<HomePage />} />
+            <Route path="/wedding/:weddingId" element={<WeddingGallery />} />
             
             {/* Admin Routes */}
             <Route path="/admin/login" element={<AdminLogin />} />
@@ -70,7 +79,13 @@ function App() {
               <Route index element={<Navigate to="/admin/dashboard" replace />} />
               <Route path="dashboard" element={<AdminDashboard />} />
               <Route path="settings" element={<AdminSettings />} />
-              {/* More admin routes will be added */}
+              <Route path="hero-carousel" element={<AdminHeroCarousel />} />
+              <Route path="weddings" element={<AdminWeddings />} />
+              <Route path="weddings/:weddingId/gallery" element={<AdminWeddingGallery />} />
+              <Route path="films" element={<AdminFilms />} />
+              <Route path="about" element={<AdminAbout />} />
+              <Route path="packages" element={<AdminPackages />} />
+              <Route path="inquiries" element={<AdminInquiries />} />
             </Route>
           </Routes>
           <Toaster position="top-right" />
