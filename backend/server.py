@@ -188,6 +188,13 @@ async def get_weddings(limit: int = 100):
     weddings = await db.weddings.find().sort("date", -1).limit(limit).to_list(limit)
     return [Wedding(**wedding) for wedding in weddings]
 
+@api_router.get("/weddings/{wedding_id}", response_model=Wedding)
+async def get_wedding(wedding_id: str):
+    wedding = await db.weddings.find_one({"id": wedding_id})
+    if not wedding:
+        raise HTTPException(status_code=404, detail="Wedding not found")
+    return Wedding(**wedding)
+
 @api_router.post("/admin/weddings", response_model=Wedding)
 async def create_wedding(
     coverImage: UploadFile = File(...),
@@ -250,8 +257,53 @@ async def delete_wedding(
         raise HTTPException(status_code=404, detail="Wedding not found")
     
     delete_file(wedding["coverImage"])
+    for image_url in wedding.get("images", []):
+        delete_file(image_url)
     await db.weddings.delete_one({"id": wedding_id})
     return {"message": "Wedding deleted successfully"}
+
+@api_router.post("/admin/weddings/{wedding_id}/images", response_model=Wedding)
+async def add_wedding_images(
+    wedding_id: str,
+    images: List[UploadFile] = File(...),
+    _: dict = Depends(verify_token)
+):
+    wedding = await db.weddings.find_one({"id": wedding_id})
+    if not wedding:
+        raise HTTPException(status_code=404, detail="Wedding not found")
+    
+    image_urls = []
+    for image in images:
+        image_url = await save_upload_file(image, "wedding")
+        image_urls.append(image_url)
+    
+    current_images = wedding.get("images", [])
+    current_images.extend(image_urls)
+    
+    await db.weddings.update_one({"id": wedding_id}, {"$set": {"images": current_images}})
+    updated_wedding = await db.weddings.find_one({"id": wedding_id})
+    return Wedding(**updated_wedding)
+
+@api_router.delete("/admin/weddings/{wedding_id}/images/{image_index}")
+async def delete_wedding_image(
+    wedding_id: str,
+    image_index: int,
+    _: dict = Depends(verify_token)
+):
+    wedding = await db.weddings.find_one({"id": wedding_id})
+    if not wedding:
+        raise HTTPException(status_code=404, detail="Wedding not found")
+    
+    images = wedding.get("images", [])
+    if image_index < 0 or image_index >= len(images):
+        raise HTTPException(status_code=404, detail="Image not found")
+    
+    image_url = images[image_index]
+    delete_file(image_url)
+    images.pop(image_index)
+    
+    await db.weddings.update_one({"id": wedding_id}, {"$set": {"images": images}})
+    return {"message": "Image deleted successfully"}
 
 # ============ FILMS ============
 
