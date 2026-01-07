@@ -111,29 +111,46 @@ const AdminSettings = () => {
     <div className="p-8">
       <div className="mb-8">
         <h1 className="text-3xl font-light mb-2">Site Settings</h1>
-        <p className="text-gray-600">Manage your website settings and logo</p>
+        <p className="text-gray-600">Manage your website branding and contact information</p>
       </div>
 
       <div className="max-w-2xl">
-        {/* Logo Upload Section */}
+        {/* Logo & Site Name Section */}
         <div className="bg-white p-6 shadow-lg mb-6">
-          <h2 className="text-xl font-medium mb-4">Website Logo</h2>
+          <h2 className="text-xl font-medium mb-4">Website Branding</h2>
           
-          <div className="space-y-4">
-            {logoPreview && (
-              <div className="border border-gray-200 p-4 inline-block">
-                <img
-                  src={logoPreview}
-                  alt="Logo preview"
-                  className="max-h-32 object-contain"
-                />
-              </div>
-            )}
-
+          <div className="space-y-6">
+            {/* Site Name */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Upload New Logo
+                Site Name
               </label>
+              <input
+                type="text"
+                value={settings.siteName}
+                onChange={(e) => setSettings({ ...settings, siteName: e.target.value })}
+                placeholder="Sayanton Sadhu Photography"
+                className="w-full px-4 py-3 border border-gray-300 focus:border-red-500 focus:ring-1 focus:ring-red-500 outline-none transition-colors"
+              />
+              <p className="text-sm text-gray-500 mt-1">
+                This name will appear in the header and throughout the website
+              </p>
+            </div>
+
+            {/* Logo Upload */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Upload Logo (Optional)
+              </label>
+              {logoPreview && (
+                <div className="border border-gray-200 p-4 mb-3 inline-block">
+                  <img
+                    src={logoPreview}
+                    alt="Logo preview"
+                    className="max-h-32 object-contain"
+                  />
+                </div>
+              )}
               <div className="flex gap-4">
                 <input
                   type="file"
@@ -157,7 +174,7 @@ const AdminSettings = () => {
                 )}
               </div>
               <p className="text-sm text-gray-500 mt-1">
-                Recommended: PNG or SVG with transparent background
+                Recommended: PNG or SVG with transparent background. If no logo is uploaded, site name will be displayed.
               </p>
             </div>
           </div>
