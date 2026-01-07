@@ -118,7 +118,7 @@ const Footer = () => {
         {/* Bottom Bar */}
         <div className="border-t border-gray-800 mt-12 pt-8 text-center">
           <p className="text-gray-400 text-sm flex items-center justify-center gap-2">
-            Made with <Heart className="w-4 h-4 text-red-500 fill-red-500" /> by Sayanton Sadhu Photography © 2024
+            Made with <Heart className="w-4 h-4 text-red-500 fill-red-500" /> by {settings?.siteName || 'Sayanton Sadhu Photography'} © 2024
           </p>
         </div>
       </div>
