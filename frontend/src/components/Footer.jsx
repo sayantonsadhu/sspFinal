@@ -1,8 +1,26 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Instagram, Facebook, Mail, Phone, MapPin, Heart } from 'lucide-react';
-import { siteSettings } from '../mock';
+import axios from 'axios';
+
+const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
+const API = `${BACKEND_URL}/api`;
 
 const Footer = () => {
+  const [settings, setSettings] = useState(null);
+
+  useEffect(() => {
+    fetchSettings();
+  }, []);
+
+  const fetchSettings = async () => {
+    try {
+      const response = await axios.get(`${API}/settings`);
+      setSettings(response.data);
+    } catch (error) {
+      console.error('Failed to load settings:', error);
+    }
+  };
+
   return (
     <footer className="bg-gray-900 text-white">
       <div className="max-w-7xl mx-auto px-6 py-16">
@@ -30,13 +48,15 @@ const Footer = () => {
               >
                 <Facebook className="w-5 h-5" />
               </a>
-              <a
-                href={`mailto:${siteSettings.email}`}
-                className="bg-white/10 hover:bg-red-500 p-3 rounded-full transition-all duration-300"
-                aria-label="Email"
-              >
-                <Mail className="w-5 h-5" />
-              </a>
+              {settings && (
+                <a
+                  href={`mailto:${settings.email}`}
+                  className="bg-white/10 hover:bg-red-500 p-3 rounded-full transition-all duration-300"
+                  aria-label="Email"
+                >
+                  <Mail className="w-5 h-5" />
+                </a>
+              )}
             </div>
           </div>
 
@@ -68,29 +88,31 @@ const Footer = () => {
           </div>
 
           {/* Contact Info */}
-          <div>
-            <h3 className="text-xl font-light mb-4">Get In Touch</h3>
-            <ul className="space-y-4">
-              <li className="flex items-start gap-3">
-                <MapPin className="w-5 h-5 text-red-500 mt-1 flex-shrink-0" />
-                <span className="text-gray-400">
-                  {siteSettings.address}
-                </span>
-              </li>
-              <li className="flex items-center gap-3">
-                <Phone className="w-5 h-5 text-red-500 flex-shrink-0" />
-                <a href={`tel:${siteSettings.phone}`} className="text-gray-400 hover:text-red-500 transition-colors">
-                  {siteSettings.phone}
-                </a>
-              </li>
-              <li className="flex items-center gap-3">
-                <Mail className="w-5 h-5 text-red-500 flex-shrink-0" />
-                <a href={`mailto:${siteSettings.email}`} className="text-gray-400 hover:text-red-500 transition-colors">
-                  {siteSettings.email}
-                </a>
-              </li>
-            </ul>
-          </div>
+          {settings && (
+            <div>
+              <h3 className="text-xl font-light mb-4">Get In Touch</h3>
+              <ul className="space-y-4">
+                <li className="flex items-start gap-3">
+                  <MapPin className="w-5 h-5 text-red-500 mt-1 flex-shrink-0" />
+                  <span className="text-gray-400">
+                    {settings.address}
+                  </span>
+                </li>
+                <li className="flex items-center gap-3">
+                  <Phone className="w-5 h-5 text-red-500 flex-shrink-0" />
+                  <a href={`tel:${settings.phone}`} className="text-gray-400 hover:text-red-500 transition-colors">
+                    {settings.phone}
+                  </a>
+                </li>
+                <li className="flex items-center gap-3">
+                  <Mail className="w-5 h-5 text-red-500 flex-shrink-0" />
+                  <a href={`mailto:${settings.email}`} className="text-gray-400 hover:text-red-500 transition-colors">
+                    {settings.email}
+                  </a>
+                </li>
+              </ul>
+            </div>
+          )}
         </div>
 
         {/* Bottom Bar */}
