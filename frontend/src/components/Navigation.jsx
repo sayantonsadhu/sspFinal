@@ -65,7 +65,7 @@ const Navigation = () => {
                 className="h-10 w-auto object-contain"
               />
             ) : (
-              <span className="text-2xl font-light tracking-wider">
+              <span className="text-2xl font-light tracking-wider" style={{ fontFamily: 'Montserrat, sans-serif' }}>
                 <span className="font-serif italic">Sayanton</span> Sadhu Photography
               </span>
             )}
