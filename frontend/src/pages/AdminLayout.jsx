@@ -28,8 +28,8 @@ const AdminLayout = () => {
       {/* Sidebar */}
       <aside className="w-64 bg-gray-900 text-white flex flex-col">
         <div className="p-6 border-b border-gray-800">
-          <h1 className="text-xl font-light">Admin Panel</h1>
-          <p className="text-sm text-gray-400 mt-1">Sayanton Sadhu Photography</p>
+          <h1 className="text-xl font-light" style={{ fontFamily: 'Montserrat, sans-serif' }}>Admin Panel</h1>
+          <p className="text-sm text-gray-400 mt-1" style={{ fontFamily: 'Montserrat, sans-serif' }}>Sayanton Sadhu Photography</p>
         </div>
 
         <nav className="flex-1 p-4">
