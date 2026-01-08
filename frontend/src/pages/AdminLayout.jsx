@@ -1,7 +1,7 @@
 import React from 'react';
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { LayoutDashboard, Settings, Image, Heart, Film, Package, Mail, LogOut, Facebook } from 'lucide-react';
+import { LayoutDashboard, Settings, Image, Heart, Film, Package, Mail, LogOut, Facebook, Share2 } from 'lucide-react';
 
 const AdminLayout = () => {
   const { logout } = useAuth();
