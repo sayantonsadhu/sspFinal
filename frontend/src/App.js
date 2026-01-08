@@ -51,6 +51,7 @@ const HomePage = () => {
         <section id="packages">
           <PackagesSection />
         </section>
+        <FacebookSection />
         <ContactSection />
       </main>
       <Footer />
