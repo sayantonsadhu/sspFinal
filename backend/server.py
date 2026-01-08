@@ -18,10 +18,12 @@ from models import (
     About, AboutUpdate,
     Package, PackageCreate, PackageUpdate,
     ContactInquiry, ContactInquiryCreate,
-    AdminLogin, AdminToken
+    AdminLogin, AdminToken,
+    FacebookSettings, FacebookSettingsCreate, FacebookSettingsUpdate
 )
 from file_upload import save_upload_file, delete_file, UPLOAD_DIR
 from auth import create_access_token, verify_admin_credentials, verify_token
+import requests
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
