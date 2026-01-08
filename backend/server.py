@@ -19,7 +19,8 @@ from models import (
     Package, PackageCreate, PackageUpdate,
     ContactInquiry, ContactInquiryCreate,
     AdminLogin, AdminToken,
-    FacebookSettings, FacebookSettingsCreate, FacebookSettingsUpdate
+    FacebookSettings, FacebookSettingsCreate, FacebookSettingsUpdate,
+    SocialMediaLinks, SocialMediaLinksUpdate
 )
 from file_upload import save_upload_file, delete_file, UPLOAD_DIR
 from auth import create_access_token, verify_admin_credentials, verify_token
