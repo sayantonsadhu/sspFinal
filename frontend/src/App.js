@@ -53,6 +53,7 @@ const HomePage = () => {
         <section id="packages">
           <PackagesSection />
         </section>
+        <SocialMediaSection />
         <FacebookSection />
         <ContactSection />
       </main>
