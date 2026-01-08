@@ -30,6 +30,7 @@ import AdminAbout from "./pages/AdminAbout";
 import AdminPackages from "./pages/AdminPackages";
 import AdminInquiries from "./pages/AdminInquiries";
 import AdminFacebook from "./pages/AdminFacebook";
+import AdminSocialMedia from "./pages/AdminSocialMedia";
 import ProtectedRoute from "./components/ProtectedRoute";
 
 const HomePage = () => {
