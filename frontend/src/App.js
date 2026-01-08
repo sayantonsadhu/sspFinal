@@ -91,8 +91,9 @@ function App() {
               <Route path="films" element={<AdminFilms />} />
               <Route path="about" element={<AdminAbout />} />
               <Route path="packages" element={<AdminPackages />} />
-              <Route path="inquiries" element={<AdminInquiries />} />
               <Route path="facebook" element={<AdminFacebook />} />
+              <Route path="social-media" element={<AdminSocialMedia />} />
+              <Route path="inquiries" element={<AdminInquiries />} />
             </Route>
           </Routes>
           <Toaster position="top-right" />
