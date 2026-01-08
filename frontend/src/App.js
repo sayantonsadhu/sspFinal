@@ -28,6 +28,7 @@ import AdminFilms from "./pages/AdminFilms";
 import AdminAbout from "./pages/AdminAbout";
 import AdminPackages from "./pages/AdminPackages";
 import AdminInquiries from "./pages/AdminInquiries";
+import AdminFacebook from "./pages/AdminFacebook";
 import ProtectedRoute from "./components/ProtectedRoute";
 
 const HomePage = () => {
