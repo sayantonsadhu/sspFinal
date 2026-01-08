@@ -89,6 +89,7 @@ function App() {
               <Route path="about" element={<AdminAbout />} />
               <Route path="packages" element={<AdminPackages />} />
               <Route path="inquiries" element={<AdminInquiries />} />
+              <Route path="facebook" element={<AdminFacebook />} />
             </Route>
           </Routes>
           <Toaster position="top-right" />
