@@ -4,7 +4,7 @@ from pathlib import Path
 from fastapi import UploadFile, HTTPException
 import shutil
 
-UPLOAD_DIR = Path("/app/backend/uploads")
+UPLOAD_DIR = Path(os.environ.get('UPLOAD_DIR', '/app/backend/uploads'))
 UPLOAD_DIR.mkdir(exist_ok=True)
 
 ALLOWED_IMAGE_EXTENSIONS = {".jpg", ".jpeg", ".png", ".webp"}
