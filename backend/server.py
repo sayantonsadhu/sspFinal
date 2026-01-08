@@ -629,6 +629,56 @@ async def test_facebook_connection(
             "message": f"Error: {str(e)}"
         }
 
+# ============ SOCIAL MEDIA LINKS ============
+
+@api_router.get("/social-media")
+async def get_social_media_links():
+    """Get social media links for public display"""
+    links = await db.social_media_links.find_one()
+    if links and links.get('enabled'):
+        # Return only non-empty links
+        result = {}
+        for platform in ['facebook', 'instagram', 'youtube', 'twitter', 'linkedin', 'pinterest', 'tiktok']:
+            if links.get(platform):
+                result[platform] = links[platform]
+        result['enabled'] = True
+        return result
+    return {"enabled": False}
+
+@api_router.get("/admin/social-media", response_model=SocialMediaLinks)
+async def get_social_media_links_admin(_: dict = Depends(verify_token)):
+    links = await db.social_media_links.find_one()
+    if not links:
+        # Create default settings
+        default_links = SocialMediaLinks(
+            facebook="",
+            instagram="",
+            youtube="",
+            twitter="",
+            linkedin="",
+            pinterest="",
+            tiktok="",
+            enabled=True
+        )
+        await db.social_media_links.insert_one(default_links.dict())
+        links = default_links.dict()
+    return SocialMediaLinks(**links)
+
+@api_router.put("/admin/social-media", response_model=SocialMediaLinks)
+async def update_social_media_links(
+    links_update: SocialMediaLinksUpdate,
+    _: dict = Depends(verify_token)
+):
+    links = await db.social_media_links.find_one()
+    if not links:
+        raise HTTPException(status_code=404, detail="Social media links not found")
+    
+    update_data = {k: v for k, v in links_update.dict().items() if v is not None}
+    await db.social_media_links.update_one({"id": links["id"]}, {"$set": update_data})
+    
+    updated_links = await db.social_media_links.find_one({"id": links["id"]})
+    return SocialMediaLinks(**updated_links)
+
 # ============ FILE SERVING ============
 
 @api_router.get("/uploads/{filename}")
