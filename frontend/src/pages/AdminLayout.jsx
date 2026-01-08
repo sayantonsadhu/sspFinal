@@ -20,6 +20,7 @@ const AdminLayout = () => {
     { name: 'Films', path: '/admin/films', icon: Film },
     { name: 'About', path: '/admin/about', icon: Settings },
     { name: 'Packages', path: '/admin/packages', icon: Package },
+    { name: 'Social Media', path: '/admin/social-media', icon: Share2 },
     { name: 'Facebook', path: '/admin/facebook', icon: Facebook },
     { name: 'Inquiries', path: '/admin/inquiries', icon: Mail },
   ];
