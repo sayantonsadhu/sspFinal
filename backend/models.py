@@ -145,3 +145,25 @@ class FacebookSettingsUpdate(BaseModel):
     accessToken: Optional[str] = None
     postsLimit: Optional[int] = None
     enabled: Optional[bool] = None
+
+# Social Media Links
+class SocialMediaLinks(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    facebook: Optional[str] = None
+    instagram: Optional[str] = None
+    youtube: Optional[str] = None
+    twitter: Optional[str] = None
+    linkedin: Optional[str] = None
+    pinterest: Optional[str] = None
+    tiktok: Optional[str] = None
+    enabled: bool = True
+
+class SocialMediaLinksUpdate(BaseModel):
+    facebook: Optional[str] = None
+    instagram: Optional[str] = None
+    youtube: Optional[str] = None
+    twitter: Optional[str] = None
+    linkedin: Optional[str] = None
+    pinterest: Optional[str] = None
+    tiktok: Optional[str] = None
+    enabled: Optional[bool] = None
