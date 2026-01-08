@@ -492,6 +492,142 @@ async def get_contact_inquiries(_: dict = Depends(verify_token)):
     inquiries = await db.contact_inquiries.find().sort("submittedAt", -1).to_list(100)
     return [ContactInquiry(**inquiry) for inquiry in inquiries]
 
+# ============ FACEBOOK INTEGRATION ============
+
+@api_router.get("/facebook/settings")
+async def get_facebook_settings():
+    settings = await db.facebook_settings.find_one()
+    if settings and settings.get('enabled'):
+        # Return public data only (no access token)
+        return {
+            "pageId": settings.get("pageId"),
+            "enabled": settings.get("enabled", True),
+            "postsLimit": settings.get("postsLimit", 6)
+        }
+    return {"enabled": False}
+
+@api_router.get("/facebook/posts")
+async def get_facebook_posts():
+    """Fetch recent posts from Facebook page"""
+    settings = await db.facebook_settings.find_one()
+    
+    if not settings or not settings.get('enabled'):
+        return []
+    
+    page_id = settings.get('pageId')
+    access_token = settings.get('accessToken')
+    posts_limit = settings.get('postsLimit', 6)
+    
+    if not page_id or not access_token:
+        return []
+    
+    try:
+        # Fetch posts from Facebook Graph API
+        url = f"https://graph.facebook.com/v18.0/{page_id}/posts"
+        params = {
+            'fields': 'id,message,created_time,full_picture,permalink_url,attachments{media,description,url}',
+            'limit': posts_limit,
+            'access_token': access_token
+        }
+        
+        response = requests.get(url, params=params, timeout=10)
+        
+        if response.status_code == 200:
+            data = response.json()
+            posts = []
+            
+            for post in data.get('data', []):
+                post_data = {
+                    'id': post.get('id'),
+                    'message': post.get('message', ''),
+                    'created_time': post.get('created_time'),
+                    'image': post.get('full_picture'),
+                    'link': post.get('permalink_url'),
+                }
+                
+                # Try to get better image from attachments
+                if post.get('attachments'):
+                    attachments = post['attachments'].get('data', [])
+                    if attachments:
+                        media = attachments[0].get('media')
+                        if media and media.get('image'):
+                            post_data['image'] = media['image'].get('src')
+                
+                posts.append(post_data)
+            
+            return posts
+        else:
+            logger.error(f"Facebook API error: {response.text}")
+            return []
+            
+    except Exception as e:
+        logger.error(f"Error fetching Facebook posts: {str(e)}")
+        return []
+
+@api_router.get("/admin/facebook/settings", response_model=FacebookSettings)
+async def get_facebook_settings_admin(_: dict = Depends(verify_token)):
+    settings = await db.facebook_settings.find_one()
+    if not settings:
+        # Create default settings
+        default_settings = FacebookSettings(
+            pageId="",
+            accessToken="",
+            postsLimit=6,
+            enabled=False
+        )
+        await db.facebook_settings.insert_one(default_settings.dict())
+        settings = default_settings.dict()
+    return FacebookSettings(**settings)
+
+@api_router.put("/admin/facebook/settings", response_model=FacebookSettings)
+async def update_facebook_settings(
+    settings_update: FacebookSettingsUpdate,
+    _: dict = Depends(verify_token)
+):
+    settings = await db.facebook_settings.find_one()
+    if not settings:
+        raise HTTPException(status_code=404, detail="Facebook settings not found")
+    
+    update_data = {k: v for k, v in settings_update.dict().items() if v is not None}
+    await db.facebook_settings.update_one({"id": settings["id"]}, {"$set": update_data})
+    
+    updated_settings = await db.facebook_settings.find_one({"id": settings["id"]})
+    return FacebookSettings(**updated_settings)
+
+@api_router.post("/admin/facebook/test")
+async def test_facebook_connection(
+    settings: FacebookSettingsCreate,
+    _: dict = Depends(verify_token)
+):
+    """Test Facebook API connection"""
+    try:
+        url = f"https://graph.facebook.com/v18.0/{settings.pageId}"
+        params = {
+            'fields': 'name,fan_count,picture',
+            'access_token': settings.accessToken
+        }
+        
+        response = requests.get(url, params=params, timeout=10)
+        
+        if response.status_code == 200:
+            data = response.json()
+            return {
+                "success": True,
+                "pageName": data.get('name'),
+                "followers": data.get('fan_count'),
+                "message": "Connection successful!"
+            }
+        else:
+            return {
+                "success": False,
+                "message": f"Failed to connect: {response.json().get('error', {}).get('message', 'Unknown error')}"
+            }
+    except Exception as e:
+        return {
+            "success": False,
+            "message": f"Error: {str(e)}"
+        }
+
 # ============ FILE SERVING ============
 
 @api_router.get("/uploads/{filename}")
