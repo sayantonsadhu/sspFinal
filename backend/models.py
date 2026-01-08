@@ -125,3 +125,23 @@ class AdminLogin(BaseModel):
 class AdminToken(BaseModel):
     access_token: str
     token_type: str = "bearer"
+
+# Facebook Settings
+class FacebookSettings(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    pageId: str
+    accessToken: str
+    postsLimit: int = 6
+    enabled: bool = True
+
+class FacebookSettingsCreate(BaseModel):
+    pageId: str
+    accessToken: str
+    postsLimit: int = 6
+    enabled: bool = True
+
+class FacebookSettingsUpdate(BaseModel):
+    pageId: Optional[str] = None
+    accessToken: Optional[str] = None
+    postsLimit: Optional[int] = None
+    enabled: Optional[bool] = None
