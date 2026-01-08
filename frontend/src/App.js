@@ -12,6 +12,7 @@ import FilmsSection from "./components/FilmsSection";
 import AboutSection from "./components/AboutSection";
 import PackagesSection from "./components/PackagesSection";
 import ContactSection from "./components/ContactSection";
+import FacebookSection from "./components/FacebookSection";
 import Footer from "./components/Footer";
 import WeddingGallery from "./pages/WeddingGallery";
 
