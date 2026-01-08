@@ -13,6 +13,7 @@ import AboutSection from "./components/AboutSection";
 import PackagesSection from "./components/PackagesSection";
 import ContactSection from "./components/ContactSection";
 import FacebookSection from "./components/FacebookSection";
+import SocialMediaSection from "./components/SocialMediaSection";
 import Footer from "./components/Footer";
 import WeddingGallery from "./pages/WeddingGallery";
 
