@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import axios from 'axios';
 
@@ -7,23 +7,36 @@ const API = `${BACKEND_URL}/api`;
 
 const HeroCarousel = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [isTransitioning, setIsTransitioning] = useState(false);
   const [images, setImages] = useState([]);
   const [loading, setLoading] = useState(true);
+  const isTransitioning = useRef(false);
+  const imagesRef = useRef([]);
+
+  // Keep imagesRef in sync with images state
+  useEffect(() => {
+    imagesRef.current = images;
+  }, [images]);
 
   useEffect(() => {
     fetchImages();
   }, []);
 
+  // Auto-rotation effect
   useEffect(() => {
-    if (images.length === 0) return;
+    if (images.length <= 1) return;
     
     const interval = setInterval(() => {
-      handleNext();
+      if (!isTransitioning.current && imagesRef.current.length > 0) {
+        isTransitioning.current = true;
+        setCurrentIndex((prev) => (prev + 1) % imagesRef.current.length);
+        setTimeout(() => {
+          isTransitioning.current = false;
+        }, 800);
+      }
     }, 5000);
 
     return () => clearInterval(interval);
-  }, [currentIndex, images]);
+  }, [images.length]);
 
   const fetchImages = async () => {
     try {
@@ -36,26 +49,32 @@ const HeroCarousel = () => {
     }
   };
 
-  const handleNext = () => {
-    if (isTransitioning || images.length === 0) return;
-    setIsTransitioning(true);
+  const handleNext = useCallback(() => {
+    if (isTransitioning.current || images.length === 0) return;
+    isTransitioning.current = true;
     setCurrentIndex((prev) => (prev + 1) % images.length);
-    setTimeout(() => setIsTransitioning(false), 800);
-  };
+    setTimeout(() => {
+      isTransitioning.current = false;
+    }, 800);
+  }, [images.length]);
 
-  const handlePrev = () => {
-    if (isTransitioning || images.length === 0) return;
-    setIsTransitioning(true);
+  const handlePrev = useCallback(() => {
+    if (isTransitioning.current || images.length === 0) return;
+    isTransitioning.current = true;
     setCurrentIndex((prev) => (prev - 1 + images.length) % images.length);
-    setTimeout(() => setIsTransitioning(false), 800);
-  };
+    setTimeout(() => {
+      isTransitioning.current = false;
+    }, 800);
+  }, [images.length]);
 
-  const goToSlide = (index) => {
-    if (isTransitioning) return;
-    setIsTransitioning(true);
+  const goToSlide = useCallback((index) => {
+    if (isTransitioning.current) return;
+    isTransitioning.current = true;
     setCurrentIndex(index);
-    setTimeout(() => setIsTransitioning(false), 800);
-  };
+    setTimeout(() => {
+      isTransitioning.current = false;
+    }, 800);
+  }, []);
 
   if (loading || images.length === 0) {
     return <div className="w-full h-screen bg-black" />;
