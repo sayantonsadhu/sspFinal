@@ -51,6 +51,7 @@ const HomePage = () => {
         <section id="films">
           <FilmsSection />
         </section>
+        <YouTubeSection />
         <section id="about">
           <AboutSection />
         </section>
