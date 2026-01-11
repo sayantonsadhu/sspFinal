@@ -754,6 +754,232 @@ async def serve_upload(filename: str):
         raise HTTPException(status_code=404, detail="File not found")
     return FileResponse(file_path)
 
+# ============ YOUTUBE STORIES ============
+
+@api_router.get("/youtube/settings")
+async def get_youtube_settings_public():
+    """Get YouTube settings for public display"""
+    settings = await db.youtube_settings.find_one()
+    if settings and settings.get('enabled'):
+        return {
+            "enabled": True,
+            "section_title": settings.get("section_title", "YouTube Stories"),
+            "section_description": settings.get("section_description", "")
+        }
+    return {"enabled": False}
+
+@api_router.get("/youtube/videos", response_model=List[YouTubeVideo])
+async def get_youtube_videos():
+    """Fetch videos from YouTube channel"""
+    settings = await db.youtube_settings.find_one()
+    
+    if not settings or not settings.get('enabled'):
+        return []
+    
+    channel_id = settings.get('channel_id')
+    api_key = settings.get('api_key')
+    max_videos = settings.get('max_videos', 6)
+    
+    if not channel_id or not api_key:
+        return []
+    
+    try:
+        # Fetch videos from YouTube Data API
+        url = "https://www.googleapis.com/youtube/v3/search"
+        params = {
+            'part': 'snippet',
+            'channelId': channel_id,
+            'maxResults': max_videos,
+            'order': 'date',
+            'type': 'video',
+            'key': api_key
+        }
+        
+        response = requests.get(url, params=params, timeout=10)
+        
+        if response.status_code == 200:
+            data = response.json()
+            videos = []
+            
+            for item in data.get('items', []):
+                snippet = item.get('snippet', {})
+                video_data = YouTubeVideo(
+                    video_id=item['id']['videoId'],
+                    title=snippet.get('title', ''),
+                    description=snippet.get('description', ''),
+                    thumbnail=snippet.get('thumbnails', {}).get('high', {}).get('url', ''),
+                    published_at=snippet.get('publishedAt', '')
+                )
+                videos.append(video_data)
+            
+            return videos
+        else:
+            logger.error(f"YouTube API error: {response.text}")
+            return []
+            
+    except Exception as e:
+        logger.error(f"Error fetching YouTube videos: {str(e)}")
+        return []
+
+@api_router.get("/admin/youtube/settings", response_model=YouTubeSettings)
+async def get_youtube_settings_admin(_: dict = Depends(verify_token)):
+    settings = await db.youtube_settings.find_one()
+    if not settings:
+        # Create default settings
+        default_settings = YouTubeSettings()
+        await db.youtube_settings.insert_one(default_settings.dict())
+        settings = default_settings.dict()
+    return YouTubeSettings(**settings)
+
+@api_router.put("/admin/youtube/settings", response_model=YouTubeSettings)
+async def update_youtube_settings(
+    settings_update: YouTubeSettingsUpdate,
+    _: dict = Depends(verify_token)
+):
+    settings = await db.youtube_settings.find_one()
+    if not settings:
+        # Create default settings first
+        default_settings = YouTubeSettings()
+        await db.youtube_settings.insert_one(default_settings.dict())
+        settings = default_settings.dict()
+    
+    update_data = {k: v for k, v in settings_update.dict().items() if v is not None}
+    await db.youtube_settings.update_one({"id": settings["id"]}, {"$set": update_data})
+    
+    updated_settings = await db.youtube_settings.find_one({"id": settings["id"]})
+    return YouTubeSettings(**updated_settings)
+
+@api_router.post("/admin/youtube/test")
+async def test_youtube_connection(
+    channel_id: str = Form(...),
+    api_key: str = Form(...),
+    _: dict = Depends(verify_token)
+):
+    """Test YouTube API connection"""
+    try:
+        url = "https://www.googleapis.com/youtube/v3/channels"
+        params = {
+            'part': 'snippet,statistics',
+            'id': channel_id,
+            'key': api_key
+        }
+        
+        response = requests.get(url, params=params, timeout=10)
+        
+        if response.status_code == 200:
+            data = response.json()
+            items = data.get('items', [])
+            if items:
+                channel = items[0]
+                snippet = channel.get('snippet', {})
+                stats = channel.get('statistics', {})
+                return {
+                    "success": True,
+                    "channelName": snippet.get('title'),
+                    "subscribers": stats.get('subscriberCount'),
+                    "videoCount": stats.get('videoCount'),
+                    "message": "Connection successful!"
+                }
+            else:
+                return {
+                    "success": False,
+                    "message": "Channel not found. Please check your Channel ID."
+                }
+        else:
+            error_msg = response.json().get('error', {}).get('message', 'Unknown error')
+            return {
+                "success": False,
+                "message": f"Failed to connect: {error_msg}"
+            }
+    except Exception as e:
+        logger.error(f"YouTube test connection error: {str(e)}")
+        return {
+            "success": False,
+            "message": f"Error: {str(e)}"
+        }
+
+# ============ SECTION CONTENT (CMS) ============
+
+@api_router.get("/sections/{section_key}")
+async def get_section_content(section_key: str):
+    """Get content for a specific section"""
+    content = await db.section_content.find_one({"section_key": section_key})
+    if content:
+        return {
+            "section_key": content["section_key"],
+            "title": content.get("title", ""),
+            "subtitle": content.get("subtitle", ""),
+            "description": content.get("description", "")
+        }
+    
+    # Return defaults based on section
+    defaults = {
+        "films": {
+            "title": "Wedding Films",
+            "subtitle": "Cinematic storytelling that brings your special day to life",
+            "description": "Every wedding film is a unique masterpiece. We capture the emotions, the laughter, and the tears, weaving them into a cinematic narrative that you'll cherish forever."
+        },
+        "about": {
+            "title": "About Me",
+            "subtitle": "The photographer behind the lens",
+            "description": ""
+        },
+        "contact": {
+            "title": "Let's Create Magic Together",
+            "subtitle": "Ready to capture your special moments? Get in touch and let's discuss your dream wedding photography",
+            "description": ""
+        },
+        "weddings": {
+            "title": "Recent Weddings",
+            "subtitle": "A glimpse into the beautiful moments we've captured",
+            "description": ""
+        },
+        "packages": {
+            "title": "Photography Packages",
+            "subtitle": "Choose the perfect package for your special day",
+            "description": ""
+        }
+    }
+    
+    return {
+        "section_key": section_key,
+        **defaults.get(section_key, {"title": "", "subtitle": "", "description": ""})
+    }
+
+@api_router.get("/admin/sections/{section_key}")
+async def get_section_content_admin(section_key: str, _: dict = Depends(verify_token)):
+    """Get section content for admin"""
+    return await get_section_content(section_key)
+
+@api_router.put("/admin/sections/{section_key}")
+async def update_section_content(
+    section_key: str,
+    update: SectionContentUpdate,
+    _: dict = Depends(verify_token)
+):
+    """Update section content"""
+    content = await db.section_content.find_one({"section_key": section_key})
+    
+    update_data = {k: v for k, v in update.dict().items() if v is not None}
+    update_data["section_key"] = section_key
+    
+    if content:
+        await db.section_content.update_one(
+            {"section_key": section_key},
+            {"$set": update_data}
+        )
+    else:
+        update_data["id"] = str(uuid.uuid4())
+        await db.section_content.insert_one(update_data)
+    
+    updated_content = await db.section_content.find_one({"section_key": section_key})
+    return {
+        "section_key": updated_content["section_key"],
+        "title": updated_content.get("title", ""),
+        "subtitle": updated_content.get("subtitle", ""),
+        "description": updated_content.get("description", "")
+    }
+
 # ============ HEALTH CHECK ============
 
 @api_router.get("/")
