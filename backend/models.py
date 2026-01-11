@@ -136,8 +136,50 @@ class AdminCredentials(BaseModel):
 
 class AdminChangeCredentials(BaseModel):
     old_password: str
-    new_username: str
-    new_password: str
+    new_username: Optional[str] = None
+    new_password: Optional[str] = None
+
+class AdminCredentialsResponse(BaseModel):
+    username: str
+    updated_at: datetime
+
+# YouTube Settings
+class YouTubeSettings(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    channel_id: str = ""
+    api_key: str = ""
+    max_videos: int = 6
+    enabled: bool = False
+    section_title: str = "YouTube Stories"
+    section_description: str = "Watch our latest stories and behind-the-scenes"
+
+class YouTubeSettingsUpdate(BaseModel):
+    channel_id: Optional[str] = None
+    api_key: Optional[str] = None
+    max_videos: Optional[int] = None
+    enabled: Optional[bool] = None
+    section_title: Optional[str] = None
+    section_description: Optional[str] = None
+
+class YouTubeVideo(BaseModel):
+    video_id: str
+    title: str
+    description: str
+    thumbnail: str
+    published_at: str
+
+# Section Content Settings (for CMS-editable titles/descriptions)
+class SectionContent(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    section_key: str  # films, about, contact, etc.
+    title: str
+    subtitle: Optional[str] = None
+    description: Optional[str] = None
+
+class SectionContentUpdate(BaseModel):
+    title: Optional[str] = None
+    subtitle: Optional[str] = None
+    description: Optional[str] = None
 
 # Facebook Settings
 class FacebookSettings(BaseModel):
