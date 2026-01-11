@@ -69,16 +69,25 @@ class FilmUpdate(BaseModel):
     title: str
     videoUrl: str
 
+# About Feature Point
+class AboutFeature(BaseModel):
+    title: str
+    description: str
+
 # About Model
 class About(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     image: str
     name: str
     bio: str
+    features: List[AboutFeature] = []
 
 class AboutUpdate(BaseModel):
     name: Optional[str] = None
     bio: Optional[str] = None
+
+class AboutFeaturesUpdate(BaseModel):
+    features: List[AboutFeature]
 
 # Package Model
 class Package(BaseModel):
