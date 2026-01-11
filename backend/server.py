@@ -437,6 +437,12 @@ async def update_featured_film(
 
 # ============ ABOUT ============
 
+DEFAULT_ABOUT_FEATURES = [
+    {"title": "Award Winning", "description": "Recognized for excellence in wedding photography across prestigious platforms"},
+    {"title": "Passion Driven", "description": "Every wedding is unique, and we pour our heart into capturing your special moments"},
+    {"title": "Expert Team", "description": "Years of experience with state-of-the-art equipment and creative storytelling"}
+]
+
 @api_router.get("/about", response_model=About)
 async def get_about():
     about = await db.about.find_one()
@@ -445,10 +451,17 @@ async def get_about():
         default_about = About(
             image="https://images.pexels.com/photos/3775262/pexels-photo-3775262.jpeg?w=800&q=80",
             name="Sayanton Sadhu Photography",
-            bio="Capturing genuine emotions and once-in-a-lifetime moments with utmost care and professionalism. From pre-wedding shoots to post-wedding celebrations, we create timeless memories that tell your unique love story. Our editorial style combines candid moments with artistic composition, ensuring every frame reflects the beauty and emotion of your special day."
+            bio="Capturing genuine emotions and once-in-a-lifetime moments with utmost care and professionalism. From pre-wedding shoots to post-wedding celebrations, we create timeless memories that tell your unique love story. Our editorial style combines candid moments with artistic composition, ensuring every frame reflects the beauty and emotion of your special day.",
+            features=DEFAULT_ABOUT_FEATURES
         )
         await db.about.insert_one(default_about.dict())
         about = default_about.dict()
+    
+    # Ensure features exist (for backward compatibility)
+    if "features" not in about or not about["features"]:
+        about["features"] = DEFAULT_ABOUT_FEATURES
+        await db.about.update_one({"id": about["id"]}, {"$set": {"features": DEFAULT_ABOUT_FEATURES}})
+    
     return About(**about)
 
 @api_router.put("/admin/about", response_model=About)
