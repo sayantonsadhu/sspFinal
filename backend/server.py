@@ -376,6 +376,26 @@ async def delete_wedding_image(
 
 # ============ FILMS ============
 
+def extract_youtube_video_id(url: str) -> Optional[str]:
+    """Extract video ID from various YouTube URL formats"""
+    import re
+    patterns = [
+        r'(?:youtube\.com/embed/)([a-zA-Z0-9_-]{11})',
+        r'(?:youtube\.com/watch\?v=)([a-zA-Z0-9_-]{11})',
+        r'(?:youtu\.be/)([a-zA-Z0-9_-]{11})',
+        r'(?:youtube\.com/v/)([a-zA-Z0-9_-]{11})',
+    ]
+    for pattern in patterns:
+        match = re.search(pattern, url)
+        if match:
+            return match.group(1)
+    return None
+
+def get_youtube_thumbnail(video_id: str) -> str:
+    """Get YouTube thumbnail URL from video ID"""
+    # Use maxresdefault first, fallback to hqdefault
+    return f"https://img.youtube.com/vi/{video_id}/maxresdefault.jpg"
+
 @api_router.get("/films/featured", response_model=Film)
 async def get_featured_film():
     film = await db.films.find_one({"isFeatured": True})
@@ -384,7 +404,7 @@ async def get_featured_film():
         default_film = Film(
             title="Wedding Film",
             videoUrl="https://www.youtube.com/embed/dQw4w9WgXcQ",
-            thumbnail="https://images.unsplash.com/photo-1617724975854-70b5d0cedb0a?w=1200&q=80",
+            thumbnail="https://img.youtube.com/vi/dQw4w9WgXcQ/maxresdefault.jpg",
             isFeatured=True
         )
         await db.films.insert_one(default_film.dict())
@@ -400,9 +420,16 @@ async def update_featured_film(
     if not film:
         raise HTTPException(status_code=404, detail="Featured film not found")
     
+    update_data = {"title": film_update.title, "videoUrl": film_update.videoUrl}
+    
+    # Auto-extract thumbnail from YouTube URL
+    video_id = extract_youtube_video_id(film_update.videoUrl)
+    if video_id:
+        update_data["thumbnail"] = get_youtube_thumbnail(video_id)
+    
     await db.films.update_one(
         {"id": film["id"]},
-        {"$set": {"title": film_update.title, "videoUrl": film_update.videoUrl}}
+        {"$set": update_data}
     )
     
     updated_film = await db.films.find_one({"id": film["id"]})
