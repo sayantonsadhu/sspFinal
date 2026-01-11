@@ -9,6 +9,7 @@ import Navigation from "./components/Navigation";
 import HeroCarousel from "./components/HeroCarousel";
 import RecentWeddings from "./components/RecentWeddings";
 import FilmsSection from "./components/FilmsSection";
+import YouTubeSection from "./components/YouTubeSection";
 import AboutSection from "./components/AboutSection";
 import PackagesSection from "./components/PackagesSection";
 import ContactSection from "./components/ContactSection";
@@ -31,6 +32,9 @@ import AdminPackages from "./pages/AdminPackages";
 import AdminInquiries from "./pages/AdminInquiries";
 import AdminFacebook from "./pages/AdminFacebook";
 import AdminSocialMedia from "./pages/AdminSocialMedia";
+import AdminYouTube from "./pages/AdminYouTube";
+import AdminSecurity from "./pages/AdminSecurity";
+import AdminSectionContent from "./pages/AdminSectionContent";
 import ProtectedRoute from "./components/ProtectedRoute";
 
 const HomePage = () => {
