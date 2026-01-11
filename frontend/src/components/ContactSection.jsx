@@ -60,14 +60,14 @@ const ContactSection = () => {
   };
 
   return (
-    <section id="contact" className="py-24 px-6 bg-white">
+    <section id="contact" className="py-24 px-6 bg-white" data-testid="contact-section">
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-16">
           <h2 className="text-5xl md:text-6xl font-light tracking-wide mb-4">
-            Let's Create Magic Together
+            {sectionContent.title}
           </h2>
           <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            Ready to capture your special moments? Get in touch and let's discuss your dream wedding photography
+            {sectionContent.subtitle}
           </p>
           <div className="w-20 h-0.5 bg-gradient-to-r from-transparent via-red-500 to-transparent mx-auto mt-6" />
         </div>
