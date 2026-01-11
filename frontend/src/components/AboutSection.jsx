@@ -7,15 +7,29 @@ const API = `${BACKEND_URL}/api`;
 
 const AboutSection = () => {
   const [about, setAbout] = useState(null);
+  const [sectionContent, setSectionContent] = useState({
+    title: 'About Me',
+    subtitle: 'The photographer behind the lens'
+  });
 
   useEffect(() => {
-    fetchAbout();
+    fetchData();
   }, []);
 
-  const fetchAbout = async () => {
+  const fetchData = async () => {
     try {
-      const response = await axios.get(`${API}/about`);
-      setAbout(response.data);
+      const [aboutRes, contentRes] = await Promise.all([
+        axios.get(`${API}/about`),
+        axios.get(`${API}/sections/about`)
+      ]);
+      setAbout(aboutRes.data);
+      if (contentRes.data) {
+        setSectionContent(prev => ({
+          ...prev,
+          title: contentRes.data.title || prev.title,
+          subtitle: contentRes.data.subtitle || prev.subtitle
+        }));
+      }
     } catch (error) {
       console.error('Failed to load about:', error);
     }
@@ -24,7 +38,7 @@ const AboutSection = () => {
   if (!about) return null;
 
   return (
-    <section className="py-24 px-6 bg-white">
+    <section className="py-24 px-6 bg-white" data-testid="about-section">
       <div className="max-w-7xl mx-auto">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
           <div className="relative">
@@ -40,9 +54,12 @@ const AboutSection = () => {
           </div>
 
           <div>
-            <h2 className="text-5xl md:text-6xl font-light tracking-wide mb-6">
-              About Me
+            <h2 className="text-5xl md:text-6xl font-light tracking-wide mb-4">
+              {sectionContent.title}
             </h2>
+            {sectionContent.subtitle && (
+              <p className="text-lg text-gray-500 mb-6">{sectionContent.subtitle}</p>
+            )}
             <div className="w-20 h-0.5 bg-red-500 mb-8" />
             
             <p className="text-lg text-gray-700 leading-relaxed mb-8">
