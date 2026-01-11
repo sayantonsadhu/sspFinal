@@ -487,6 +487,32 @@ async def update_about(
     
     await db.about.update_one({"id": about["id"]}, {"$set": update_data})
     updated_about = await db.about.find_one({"id": about["id"]})
+    
+    # Ensure features exist
+    if "features" not in updated_about or not updated_about["features"]:
+        updated_about["features"] = DEFAULT_ABOUT_FEATURES
+    
+    return About(**updated_about)
+
+@api_router.put("/admin/about/features", response_model=About)
+async def update_about_features(
+    features_update: AboutFeaturesUpdate,
+    _: dict = Depends(verify_token)
+):
+    """Update the feature points in the About section"""
+    about = await db.about.find_one()
+    if not about:
+        raise HTTPException(status_code=404, detail="About section not found")
+    
+    # Convert features to dict format for MongoDB
+    features_dict = [f.dict() for f in features_update.features]
+    
+    await db.about.update_one(
+        {"id": about["id"]},
+        {"$set": {"features": features_dict}}
+    )
+    
+    updated_about = await db.about.find_one({"id": about["id"]})
     return About(**updated_about)
 
 # ============ PACKAGES ============
