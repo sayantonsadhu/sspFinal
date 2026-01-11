@@ -51,15 +51,78 @@ logger = logging.getLogger(__name__)
 
 # ============ AUTHENTICATION ============
 
+async def get_or_create_admin():
+    """Get admin credentials from DB or create default"""
+    admin = await db.admin_credentials.find_one()
+    if not admin:
+        # Create default admin with hashed password
+        admin_data = {
+            "id": str(uuid.uuid4()),
+            "username": DEFAULT_ADMIN_USERNAME,
+            "password_hash": hash_password(DEFAULT_ADMIN_PASSWORD),
+            "created_at": datetime.utcnow(),
+            "updated_at": datetime.utcnow()
+        }
+        await db.admin_credentials.insert_one(admin_data)
+        admin = admin_data
+    return admin
+
 @api_router.post("/admin/login", response_model=AdminToken)
 async def admin_login(credentials: AdminLogin):
-    if verify_admin_credentials(credentials.username, credentials.password):
-        access_token = create_access_token(
-            data={"sub": credentials.username},
-            expires_delta=timedelta(hours=24)
-        )
-        return {"access_token": access_token, "token_type": "bearer"}
-    raise HTTPException(status_code=401, detail="Invalid credentials")
+    admin = await get_or_create_admin()
+    
+    if credentials.username != admin["username"]:
+        logger.warning(f"Login attempt with invalid username: {credentials.username}")
+        raise HTTPException(status_code=401, detail="Invalid credentials")
+    
+    if not verify_password(credentials.password, admin["password_hash"]):
+        logger.warning(f"Login attempt with invalid password for user: {credentials.username}")
+        raise HTTPException(status_code=401, detail="Invalid credentials")
+    
+    access_token = create_access_token(
+        data={"sub": credentials.username},
+        expires_delta=timedelta(hours=24)
+    )
+    logger.info(f"Successful login for user: {credentials.username}")
+    return {"access_token": access_token, "token_type": "bearer"}
+
+@api_router.get("/admin/credentials", response_model=AdminCredentialsResponse)
+async def get_admin_credentials(_: dict = Depends(verify_token)):
+    """Get current admin username"""
+    admin = await get_or_create_admin()
+    return {"username": admin["username"], "updated_at": admin["updated_at"]}
+
+@api_router.put("/admin/credentials", response_model=AdminCredentialsResponse)
+async def change_admin_credentials(
+    credentials: AdminChangeCredentials,
+    _: dict = Depends(verify_token)
+):
+    """Change admin username and/or password"""
+    admin = await get_or_create_admin()
+    
+    # Verify old password
+    if not verify_password(credentials.old_password, admin["password_hash"]):
+        logger.warning("Failed credential change attempt - invalid old password")
+        raise HTTPException(status_code=400, detail="Current password is incorrect")
+    
+    update_data = {"updated_at": datetime.utcnow()}
+    
+    if credentials.new_username:
+        update_data["username"] = credentials.new_username
+    
+    if credentials.new_password:
+        if len(credentials.new_password) < 6:
+            raise HTTPException(status_code=400, detail="New password must be at least 6 characters")
+        update_data["password_hash"] = hash_password(credentials.new_password)
+    
+    await db.admin_credentials.update_one(
+        {"id": admin["id"]},
+        {"$set": update_data}
+    )
+    
+    updated_admin = await db.admin_credentials.find_one({"id": admin["id"]})
+    logger.info(f"Admin credentials updated successfully")
+    return {"username": updated_admin["username"], "updated_at": updated_admin["updated_at"]}
 
 # ============ SITE SETTINGS ============
 
