@@ -98,6 +98,9 @@ function App() {
               <Route path="packages" element={<AdminPackages />} />
               <Route path="facebook" element={<AdminFacebook />} />
               <Route path="social-media" element={<AdminSocialMedia />} />
+              <Route path="youtube" element={<AdminYouTube />} />
+              <Route path="section-content" element={<AdminSectionContent />} />
+              <Route path="security" element={<AdminSecurity />} />
               <Route path="inquiries" element={<AdminInquiries />} />
             </Route>
           </Routes>
