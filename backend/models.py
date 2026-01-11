@@ -126,6 +126,19 @@ class AdminToken(BaseModel):
     access_token: str
     token_type: str = "bearer"
 
+# Admin Credentials (stored in DB)
+class AdminCredentials(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    username: str
+    password_hash: str
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+    updated_at: datetime = Field(default_factory=datetime.utcnow)
+
+class AdminChangeCredentials(BaseModel):
+    old_password: str
+    new_username: str
+    new_password: str
+
 # Facebook Settings
 class FacebookSettings(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
