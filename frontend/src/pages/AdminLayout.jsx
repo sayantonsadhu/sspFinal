@@ -1,7 +1,7 @@
 import React from 'react';
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { LayoutDashboard, Settings, Image, Heart, Film, Package, Mail, LogOut, Facebook, Share2 } from 'lucide-react';
+import { LayoutDashboard, Settings, Image, Heart, Film, Package, Mail, LogOut, Facebook, Share2, Youtube, FileText, Shield } from 'lucide-react';
 
 const AdminLayout = () => {
   const { logout } = useAuth();
@@ -20,9 +20,12 @@ const AdminLayout = () => {
     { name: 'Films', path: '/admin/films', icon: Film },
     { name: 'About', path: '/admin/about', icon: Settings },
     { name: 'Packages', path: '/admin/packages', icon: Package },
+    { name: 'YouTube', path: '/admin/youtube', icon: Youtube },
     { name: 'Social Media', path: '/admin/social-media', icon: Share2 },
     { name: 'Facebook', path: '/admin/facebook', icon: Facebook },
+    { name: 'Section Content', path: '/admin/section-content', icon: FileText },
     { name: 'Inquiries', path: '/admin/inquiries', icon: Mail },
+    { name: 'Security', path: '/admin/security', icon: Shield },
   ];
 
   return (
