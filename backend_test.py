@@ -13,7 +13,7 @@ from PIL import Image
 import io
 
 # Configuration
-BASE_URL = "https://photo-chronicle.preview.emergentagent.com/api"
+BASE_URL = "https://lensmasters-14.preview.emergentagent.com/api"
 ADMIN_USERNAME = "admin"
 ADMIN_PASSWORD = "admin123"
 
