@@ -18,12 +18,14 @@ from models import (
     About, AboutUpdate,
     Package, PackageCreate, PackageUpdate,
     ContactInquiry, ContactInquiryCreate,
-    AdminLogin, AdminToken,
+    AdminLogin, AdminToken, AdminChangeCredentials, AdminCredentialsResponse,
     FacebookSettings, FacebookSettingsCreate, FacebookSettingsUpdate,
-    SocialMediaLinks, SocialMediaLinksUpdate
+    SocialMediaLinks, SocialMediaLinksUpdate,
+    YouTubeSettings, YouTubeSettingsUpdate, YouTubeVideo,
+    SectionContent, SectionContentUpdate
 )
 from file_upload import save_upload_file, delete_file, UPLOAD_DIR
-from auth import create_access_token, verify_admin_credentials, verify_token
+from auth import create_access_token, verify_token, hash_password, verify_password, DEFAULT_ADMIN_USERNAME, DEFAULT_ADMIN_PASSWORD
 import requests
 
 ROOT_DIR = Path(__file__).parent
