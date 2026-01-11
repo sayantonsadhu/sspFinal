@@ -1,41 +1,46 @@
 import React, { useState, useEffect } from 'react';
-import { Award, Heart, Camera } from 'lucide-react';
+import { Award, Heart, Camera, Star, Sparkles, Users } from 'lucide-react';
 import axios from 'axios';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
 
+// Icon mapping for feature points
+const iconMap = {
+  0: Award,
+  1: Heart,
+  2: Camera,
+  3: Star,
+  4: Sparkles,
+  5: Users
+};
+
 const AboutSection = () => {
   const [about, setAbout] = useState(null);
-  const [sectionContent, setSectionContent] = useState({
-    title: 'About Me',
-    subtitle: 'The photographer behind the lens'
-  });
 
   useEffect(() => {
-    fetchData();
+    fetchAbout();
   }, []);
 
-  const fetchData = async () => {
+  const fetchAbout = async () => {
     try {
-      const [aboutRes, contentRes] = await Promise.all([
-        axios.get(`${API}/about`),
-        axios.get(`${API}/sections/about`)
-      ]);
-      setAbout(aboutRes.data);
-      if (contentRes.data) {
-        setSectionContent(prev => ({
-          ...prev,
-          title: contentRes.data.title || prev.title,
-          subtitle: contentRes.data.subtitle || prev.subtitle
-        }));
-      }
+      const response = await axios.get(`${API}/about`);
+      setAbout(response.data);
     } catch (error) {
       console.error('Failed to load about:', error);
     }
   };
 
   if (!about) return null;
+
+  // Use features from database or default
+  const features = about.features && about.features.length > 0 
+    ? about.features 
+    : [
+        { title: "Award Winning", description: "Recognized for excellence in wedding photography across prestigious platforms" },
+        { title: "Passion Driven", description: "Every wedding is unique, and we pour our heart into capturing your special moments" },
+        { title: "Expert Team", description: "Years of experience with state-of-the-art equipment and creative storytelling" }
+      ];
 
   return (
     <section className="py-24 px-6 bg-white" data-testid="about-section">
@@ -54,12 +59,9 @@ const AboutSection = () => {
           </div>
 
           <div>
-            <h2 className="text-5xl md:text-6xl font-light tracking-wide mb-4">
-              {sectionContent.title}
+            <h2 className="text-5xl md:text-6xl font-light tracking-wide mb-6">
+              About Me
             </h2>
-            {sectionContent.subtitle && (
-              <p className="text-lg text-gray-500 mb-6">{sectionContent.subtitle}</p>
-            )}
             <div className="w-20 h-0.5 bg-red-500 mb-8" />
             
             <p className="text-lg text-gray-700 leading-relaxed mb-8">
@@ -67,41 +69,20 @@ const AboutSection = () => {
             </p>
 
             <div className="space-y-6 mt-12">
-              <div className="flex items-start gap-4">
-                <div className="bg-red-50 p-3 rounded-lg">
-                  <Award className="w-6 h-6 text-red-500" />
-                </div>
-                <div>
-                  <h3 className="font-medium text-lg mb-1">Award Winning</h3>
-                  <p className="text-gray-600">
-                    Recognized for excellence in wedding photography across prestigious platforms
-                  </p>
-                </div>
-              </div>
-
-              <div className="flex items-start gap-4">
-                <div className="bg-red-50 p-3 rounded-lg">
-                  <Heart className="w-6 h-6 text-red-500" />
-                </div>
-                <div>
-                  <h3 className="font-medium text-lg mb-1">Passion Driven</h3>
-                  <p className="text-gray-600">
-                    Every wedding is unique, and we pour our heart into capturing your special moments
-                  </p>
-                </div>
-              </div>
-
-              <div className="flex items-start gap-4">
-                <div className="bg-red-50 p-3 rounded-lg">
-                  <Camera className="w-6 h-6 text-red-500" />
-                </div>
-                <div>
-                  <h3 className="font-medium text-lg mb-1">Expert Team</h3>
-                  <p className="text-gray-600">
-                    Years of experience with state-of-the-art equipment and creative storytelling
-                  </p>
-                </div>
-              </div>
+              {features.map((feature, index) => {
+                const IconComponent = iconMap[index % Object.keys(iconMap).length];
+                return (
+                  <div key={index} className="flex items-start gap-4">
+                    <div className="bg-red-50 p-3 rounded-lg">
+                      <IconComponent className="w-6 h-6 text-red-500" />
+                    </div>
+                    <div>
+                      <h3 className="font-medium text-lg mb-1">{feature.title}</h3>
+                      <p className="text-gray-600">{feature.description}</p>
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           </div>
         </div>
