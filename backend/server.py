@@ -16,7 +16,7 @@ from models import (
     HeroCarouselItem, HeroCarouselUpdate, HeroCarouselReorder,
     Wedding, WeddingCreate, WeddingUpdate,
     Film, FilmUpdate,
-    About, AboutUpdate,
+    About, AboutUpdate, AboutFeaturesUpdate, AboutFeature,
     Package, PackageCreate, PackageUpdate,
     ContactInquiry, ContactInquiryCreate,
     AdminLogin, AdminToken, AdminChangeCredentials, AdminCredentialsResponse,
