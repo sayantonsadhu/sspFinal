@@ -8,6 +8,10 @@ const API = `${BACKEND_URL}/api`;
 
 const ContactSection = () => {
   const [settings, setSettings] = useState(null);
+  const [sectionContent, setSectionContent] = useState({
+    title: "Let's Create Magic Together",
+    subtitle: "Ready to capture your special moments? Get in touch and let's discuss your dream wedding photography"
+  });
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -18,15 +22,25 @@ const ContactSection = () => {
   const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
-    fetchSettings();
+    fetchData();
   }, []);
 
-  const fetchSettings = async () => {
+  const fetchData = async () => {
     try {
-      const response = await axios.get(`${API}/settings`);
-      setSettings(response.data);
+      const [settingsRes, contentRes] = await Promise.all([
+        axios.get(`${API}/settings`),
+        axios.get(`${API}/sections/contact`)
+      ]);
+      setSettings(settingsRes.data);
+      if (contentRes.data) {
+        setSectionContent(prev => ({
+          ...prev,
+          title: contentRes.data.title || prev.title,
+          subtitle: contentRes.data.subtitle || prev.subtitle
+        }));
+      }
     } catch (error) {
-      console.error('Failed to load settings:', error);
+      console.error('Failed to load data:', error);
     }
   };
 
